@@ -1,0 +1,3 @@
+$(eval $(call addlib,appdummykernel))
+
+APPDUMMYKERNEL_SRCS-y += $(APPDUMMYKERNEL_BASE)/dummymain.c
