@@ -19,12 +19,10 @@ jobs:
         with:
           repository: unikraft/lib-musl
           path: .unikraft/libs/musl
-      - name: Link Makefile
-        run: |
-          make -C .unikraft/unikraft CONFIG_UK_BASE=$PWD/.unikraft/unikraft/ O=$PWD/.unikraft/build/ A=$PWD L=$PWD/.unikraft/libs/musl N=dummykernel C=$PWD/.config.dummykernel_qemu-x86_64 $PWD/.unikraft/build/Makefile V=1
       - name: Build unikernel
         run: |
-          make -C .unikraft/build CONFIG_UK_BASE=$PWD/.unikraft/unikraft/ O=$PWD/.unikraft/build/ A=$PWD L=$PWD/.unikraft/libs/musl N=dummykernel C=$PWD/.config.dummykernel_qemu-x86_64 V=1
+          mkdir -p .unikraft/build
+          make -C .unikraft/build CONFIG_UK_BASE=$PWD/.unikraft/unikraft/ O=$PWD/.unikraft/build/ A=$PWD L=$PWD/.unikraft/libs/musl N=dummykernel C=$PWD/.config.dummykernel_qemu-x86_64 -f $PWD/.unikraft/unikraft/Makefile V=1
       - name: Log
         run: |
           find .unikraft/build -name \*.cmd | xargs head
