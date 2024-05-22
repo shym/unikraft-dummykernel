@@ -14,6 +14,7 @@ jobs:
         with:
           repository: unikraft/unikraft
           path: .unikraft/unikraft
+          ref: RELEASE-0.16.3
       - name: Fetch Unikraft’s musl
         uses: actions/checkout@v4
         with:
