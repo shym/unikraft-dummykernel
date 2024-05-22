@@ -37,3 +37,7 @@ jobs:
       - name: Log
         run: |
           find .unikraft/build -name \*.cmd | xargs head
+
+      - name: Look up global configuration
+        run: |
+          cat .unikraft/build/config
