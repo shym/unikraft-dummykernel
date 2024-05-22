@@ -44,4 +44,7 @@ jobs:
 
       - name: Look up global configuration
         run: |
+          cat .config.dummykernel_qemu-x86_64
+          echo ------
           cat .unikraft/build/config
+          diff -u .config.dummykernel_qemu-x86_64 .unikraft/build/config || true
