@@ -44,7 +44,7 @@ jobs:
       - name: Build unikernel
         run: |
           umask 0022
-          make -C .unikraft/qemu CONFIG_UK_BASE=$PWD/.unikraft/unikraft/ O=$PWD/.unikraft/qemu/ A=$PWD L=$PWD/.unikraft/libs/musl N=dummykernel C=$PWD/.config.dummykernel_qemu-x86_64 -f $PWD/.unikraft/unikraft/Makefile V=1
+          make -C .unikraft/qemu CONFIG_UK_BASE=$PWD/.unikraft/unikraft/ O=$PWD/.unikraft/qemu/ A=$PWD L=$PWD/.unikraft/libs/musl N=dummykernel C=$PWD/.config.dummykernel_qemu-x86_64 sub_exec_make=1 V=1
 
       - name: Copy musl sources
         run: |
@@ -59,15 +59,17 @@ jobs:
       - name: Build unikernel
         run: |
           umask 0022
-          make -C .unikraft/fc CONFIG_UK_BASE=$PWD/.unikraft/unikraft/ O=$PWD/.unikraft/fc/ A=$PWD L=$PWD/.unikraft/libs/musl N=dummykernel C=$PWD/.config.dummykernel_fc-x86_64 -f $PWD/.unikraft/unikraft/Makefile V=1
+          make -C .unikraft/fc CONFIG_UK_BASE=$PWD/.unikraft/unikraft/ O=$PWD/.unikraft/fc/ A=$PWD L=$PWD/.unikraft/libs/musl N=dummykernel C=$PWD/.config.dummykernel_fc-x86_64 sub_exec_make=1 V=1
 
       - name: Log
         run: |
-          head .unikraft/qemu/appdummykernel.ld.o.cmd .unikraft/qemu/dummykernel_qemu-x86_64.dbg.cmd .unikraft/qemu/dummykernel_qemu-x86_64.cmd .unikraft/qemu/dummykernel_qemu-x86_64.bootinfo.cmd
-          head .unikraft/fc/appdummykernel.ld.o.cmd .unikraft/fc/dummykernel_fc-x86_64.dbg.cmd .unikraft/fc/dummykernel_fc-x86_64.cmd .unikraft/fc/dummykernel_fc-x86_64.bootinfo.cmd
+          head .unikraft/qemu/appdummykernel/dummymain.o.cmd .unikraft/qemu/appdummykernel.ld.o.cmd .unikraft/qemu/dummykernel_qemu-x86_64.dbg.cmd .unikraft/qemu/dummykernel_qemu-x86_64.cmd .unikraft/qemu/dummykernel_qemu-x86_64.bootinfo.cmd
+          head .unikraft/fc/appdummykernel/dummymain.o.cmd .unikraft/fc/appdummykernel.ld.o.cmd .unikraft/fc/dummykernel_fc-x86_64.dbg.cmd .unikraft/fc/dummykernel_fc-x86_64.cmd .unikraft/fc/dummykernel_fc-x86_64.bootinfo.cmd
 
       - name: Look up global configurations
         run: |
+          git diff
+          echo ------
           cat .config.dummykernel_qemu-x86_64
           echo ------
           cat .unikraft/qemu/config
@@ -87,4 +89,4 @@ jobs:
       - name: Rebuild info
         run: |
           umask 0022
-          make -C .unikraft/qemu CONFIG_UK_BASE=$PWD/.unikraft/unikraft/ O=$PWD/.unikraft/qemu/ A=$PWD L=$PWD/.unikraft/libs/musl N=dummykernel C=$PWD/.config.dummykernel_qemu-x86_64 -f $PWD/.unikraft/unikraft/Makefile -W dummykernel_qemu-x86_64.dbg -n V=1
+          make -C .unikraft/qemu CONFIG_UK_BASE=$PWD/.unikraft/unikraft/ O=$PWD/.unikraft/qemu/ A=$PWD L=$PWD/.unikraft/libs/musl N=dummykernel C=$PWD/.config.dummykernel_qemu-x86_64 -W dummykernel_qemu-x86_64.dbg sub_exec_make=1 -n
