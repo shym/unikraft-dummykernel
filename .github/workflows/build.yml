@@ -26,25 +26,65 @@ jobs:
       - name: Cache musl
         uses: actions/cache@v4
         with:
-          path: .unikraft/build/libmusl/*.tar.gz
+          path: |
+            .unikraft/build/libmusl/*.tar.gz
+            .unikraft/qemu/libmusl/*.tar.gz
           key: musl
 
-      - name: Complete configuration
+      - name: Create default build directories
         run: |
-          mkdir -p .unikraft/build
-          make -C .unikraft/build CONFIG_UK_BASE=$PWD/.unikraft/unikraft/ O=$PWD/.unikraft/build/ A=$PWD L=$PWD/.unikraft/libs/musl N=dummykernel C=$PWD/.config.dummykernel_qemu-x86_64 -f $PWD/.unikraft/unikraft/Makefile olddefconfig V=1
+          mkdir -p .unikraft/qemu .unikraft/fc
+          if [ -e .unikraft/build/libmusl ]; then mv .unikraft/build/libmusl .unikraft/qemu/; fi
+
+      - name: Complete QEMU configuration
+        run: |
+          umask 0022
+          make -C .unikraft/qemu CONFIG_UK_BASE=$PWD/.unikraft/unikraft/ O=$PWD/.unikraft/qemu/ A=$PWD L=$PWD/.unikraft/libs/musl N=dummykernel C=$PWD/.config.dummykernel_qemu-x86_64 -f $PWD/.unikraft/unikraft/Makefile olddefconfig V=1
 
       - name: Build unikernel
         run: |
-          make -C .unikraft/build CONFIG_UK_BASE=$PWD/.unikraft/unikraft/ O=$PWD/.unikraft/build/ A=$PWD L=$PWD/.unikraft/libs/musl N=dummykernel C=$PWD/.config.dummykernel_qemu-x86_64 -f $PWD/.unikraft/unikraft/Makefile V=1
+          umask 0022
+          make -C .unikraft/qemu CONFIG_UK_BASE=$PWD/.unikraft/unikraft/ O=$PWD/.unikraft/qemu/ A=$PWD L=$PWD/.unikraft/libs/musl N=dummykernel C=$PWD/.config.dummykernel_qemu-x86_64 -f $PWD/.unikraft/unikraft/Makefile V=1
+
+      - name: Copy musl sources
+        run: |
+          mkdir -p .unikraft/fc/libmusl
+          cp .unikraft/qemu/libmusl/*.tar.gz .unikraft/fc/libmusl/
+
+      - name: Complete FC configuration
+        run: |
+          umask 0022
+          make -C .unikraft/fc CONFIG_UK_BASE=$PWD/.unikraft/unikraft/ O=$PWD/.unikraft/fc/ A=$PWD L=$PWD/.unikraft/libs/musl N=dummykernel C=$PWD/.config.dummykernel_fc-x86_64 -f $PWD/.unikraft/unikraft/Makefile olddefconfig V=1
+
+      - name: Build unikernel
+        run: |
+          umask 0022
+          make -C .unikraft/fc CONFIG_UK_BASE=$PWD/.unikraft/unikraft/ O=$PWD/.unikraft/fc/ A=$PWD L=$PWD/.unikraft/libs/musl N=dummykernel C=$PWD/.config.dummykernel_fc-x86_64 -f $PWD/.unikraft/unikraft/Makefile V=1
 
       - name: Log
         run: |
-          find .unikraft/build -name \*.cmd | xargs head
+          head .unikraft/qemu/appdummykernel.ld.o.cmd .unikraft/qemu/dummykernel_qemu-x86_64.dbg.cmd .unikraft/qemu/dummykernel_qemu-x86_64.cmd .unikraft/qemu/dummykernel_qemu-x86_64.bootinfo.cmd
+          head .unikraft/fc/appdummykernel.ld.o.cmd .unikraft/fc/dummykernel_fc-x86_64.dbg.cmd .unikraft/fc/dummykernel_fc-x86_64.cmd .unikraft/fc/dummykernel_fc-x86_64.bootinfo.cmd
 
-      - name: Look up global configuration
+      - name: Look up global configurations
         run: |
           cat .config.dummykernel_qemu-x86_64
           echo ------
-          cat .unikraft/build/config
-          diff -u .config.dummykernel_qemu-x86_64 .unikraft/build/config || true
+          cat .unikraft/qemu/config
+          echo ------
+          diff -u .config.dummykernel_qemu-x86_64 .unikraft/qemu/config || true
+          echo ------
+          cat .config.dummykernel_fc-x86_64
+          echo ------
+          cat .unikraft/fc/config
+          echo ------
+          diff -u .config.dummykernel_fc-x86_64 .unikraft/fc/config || true
+
+      - name: Compare the builds
+        run: |
+          git diff --no-index .unikraft/qemu .unikraft/fc || true
+
+      - name: Rebuild info
+        run: |
+          umask 0022
+          make -C .unikraft/qemu CONFIG_UK_BASE=$PWD/.unikraft/unikraft/ O=$PWD/.unikraft/qemu/ A=$PWD L=$PWD/.unikraft/libs/musl N=dummykernel C=$PWD/.config.dummykernel_qemu-x86_64 -f $PWD/.unikraft/unikraft/Makefile -W dummykernel_qemu-x86_64.dbg -n V=1
