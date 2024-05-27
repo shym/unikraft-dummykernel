@@ -40,6 +40,8 @@ jobs:
         run: |
           umask 0022
           make -C .unikraft/qemu CONFIG_UK_BASE=$PWD/.unikraft/unikraft/ O=$PWD/.unikraft/qemu/ A=$PWD L=$PWD/.unikraft/libs/musl N=dummykernel C=$PWD/.config.dummykernel_qemu-x86_64 -f $PWD/.unikraft/unikraft/Makefile olddefconfig V=1
+          echo ------
+          cat .config.dummykernel_qemu-x86_64
 
       - name: Build unikernel
         run: |
@@ -55,6 +57,8 @@ jobs:
         run: |
           umask 0022
           make -C .unikraft/fc CONFIG_UK_BASE=$PWD/.unikraft/unikraft/ O=$PWD/.unikraft/fc/ A=$PWD L=$PWD/.unikraft/libs/musl N=dummykernel C=$PWD/.config.dummykernel_fc-x86_64 -f $PWD/.unikraft/unikraft/Makefile olddefconfig V=1
+          echo ------
+          cat .config.dummykernel_fc-x86_64
 
       - name: Build unikernel
         run: |
@@ -70,23 +74,15 @@ jobs:
         run: |
           git diff
           echo ------
-          cat .config.dummykernel_qemu-x86_64
-          echo ------
           cat .unikraft/qemu/config
           echo ------
-          diff -u .config.dummykernel_qemu-x86_64 .unikraft/qemu/config || true
-          echo ------
-          cat .config.dummykernel_fc-x86_64
-          echo ------
           cat .unikraft/fc/config
-          echo ------
-          diff -u .config.dummykernel_fc-x86_64 .unikraft/fc/config || true
 
       - name: Compare the builds
         run: |
-          git diff --no-index .unikraft/qemu .unikraft/fc || true
+          git diff --stat --no-index .unikraft/qemu .unikraft/fc || true
 
       - name: Rebuild info
         run: |
           umask 0022
-          make -C .unikraft/qemu CONFIG_UK_BASE=$PWD/.unikraft/unikraft/ O=$PWD/.unikraft/qemu/ A=$PWD L=$PWD/.unikraft/libs/musl N=dummykernel C=$PWD/.config.dummykernel_qemu-x86_64 -W dummykernel_qemu-x86_64.dbg sub_exec_make=1 -n
+          make -C .unikraft/qemu CONFIG_UK_BASE=$PWD/.unikraft/unikraft/ O=$PWD/.unikraft/qemu/ A=$PWD L=$PWD/.unikraft/libs/musl N=dummykernel C=$PWD/.config.dummykernel_qemu-x86_64 -o dummykernel_qemu-x86_64.dbg sub_exec_make=1 -n
