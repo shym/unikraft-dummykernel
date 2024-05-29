@@ -46,7 +46,7 @@ jobs:
       - name: Build unikernel
         run: |
           umask 0022
-          make -C .unikraft/qemu CONFIG_UK_BASE=$PWD/.unikraft/unikraft/ O=$PWD/.unikraft/qemu/ A=$PWD L=$PWD/.unikraft/libs/musl N=dummykernel C=$PWD/.config.dummykernel_qemu-x86_64 sub_exec_make=1 V=1
+          make -C .unikraft/qemu CONFIG_UK_BASE=$PWD/.unikraft/unikraft/ O=$PWD/.unikraft/qemu/ A=$PWD L=$PWD/.unikraft/libs/musl N=dummykernel C=$PWD/.config.dummykernel_qemu-x86_64 sub_make_exec=1 V=1
 
       - name: Copy musl sources
         run: |
@@ -63,7 +63,7 @@ jobs:
       - name: Build unikernel
         run: |
           umask 0022
-          make -C .unikraft/fc CONFIG_UK_BASE=$PWD/.unikraft/unikraft/ O=$PWD/.unikraft/fc/ A=$PWD L=$PWD/.unikraft/libs/musl N=dummykernel C=$PWD/.config.dummykernel_fc-x86_64 sub_exec_make=1 V=1
+          make -C .unikraft/fc CONFIG_UK_BASE=$PWD/.unikraft/unikraft/ O=$PWD/.unikraft/fc/ A=$PWD L=$PWD/.unikraft/libs/musl N=dummykernel C=$PWD/.config.dummykernel_fc-x86_64 sub_make_exec=1 V=1
 
       - name: Log
         run: |
@@ -85,4 +85,4 @@ jobs:
       - name: Rebuild info
         run: |
           umask 0022
-          make -C .unikraft/qemu CONFIG_UK_BASE=$PWD/.unikraft/unikraft/ O=$PWD/.unikraft/qemu/ A=$PWD L=$PWD/.unikraft/libs/musl N=dummykernel C=$PWD/.config.dummykernel_qemu-x86_64 -o dummykernel_qemu-x86_64.dbg sub_exec_make=1 -n
+          make -C .unikraft/qemu CONFIG_UK_BASE=$PWD/.unikraft/unikraft/ O=$PWD/.unikraft/qemu/ A=$PWD L=$PWD/.unikraft/libs/musl N=dummykernel C=$PWD/.config.dummykernel_qemu-x86_64 -o dummykernel_qemu-x86_64.dbg sub_make_exec=1 -n
